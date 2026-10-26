@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RSATestApp.ViewModels"
+             x:Class="RSATestApp.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="RSA Login">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+
+            <!-- Server address: 10.0.2.2 for Android emulator, PC's LAN IP for a real device -->
+            <Label Text="Server" FontAttributes="Bold" />
+            <Entry Text="{Binding ServerUrl}" Keyboard="Url" />
+
+            <!-- Credentials -->
+            <Label Text="Login" FontAttributes="Bold" />
+            <Entry Text="{Binding Login}" />
+
+            <Label Text="Password" FontAttributes="Bold" />
+            <Entry Text="{Binding Password}" IsPassword="True" />
+
+            <!-- Button is disabled automatically while the request is running (CanExecute => !IsBusy) -->
+            <Button Text="Sign in"
+                    Command="{Binding LoginCommand}"
+                    Margin="0,8,0,0" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}" />
+
+            <!-- Result status: red by default, green on successful login -->
+            <Label Text="{Binding StatusText}"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   TextColor="Crimson">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding IsSuccess}" Value="True">
+                        <Setter Property="TextColor" Value="SeaGreen" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+
+            <!-- Step-by-step trace of the RSA flow, shown only after a response is received -->
+            <VerticalStackLayout IsVisible="{Binding HasTrace}" Spacing="12">
+
+                <Label Text="How it worked"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       Margin="0,12,0,0" />
+
+                <!-- Step 1: public key received from the server -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="1. Server public key (E, N)" FontAttributes="Bold" />
+                        <Label Text="{Binding PublicKeyText}" FontFamily="monospace" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Step 2: plaintext JSON before encryption -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="2. Plaintext (before encryption)" FontAttributes="Bold" />
+                        <Label Text="{Binding PlainText}" FontFamily="monospace" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Step 3: ciphertext blocks as sent over the network (Base64) -->
+                <Border Padding="12" StrokeShape="RoundRectangle 8">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="3. Encrypted blocks C = M^E mod N (Base64)" FontAttributes="Bold" />
+                        <Label Text="{Binding CipherText}" FontFamily="monospace" FontSize="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
